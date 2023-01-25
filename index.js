@@ -1,8 +1,12 @@
+'use strict';
+
 // Require dotenv for environment variables
 require('dotenv').config();
 
+const fs = require('node:fs');
+
 // Require the necessary discord.js classes
-const {Client, Events, GatewayIntentBits, Partials} = require('discord.js');
+const {Client, Events, GatewayIntentBits, Partials, Collection} = require('discord.js');
 
 // Create a new client instance
 const client = new Client({
@@ -32,17 +36,45 @@ const client = new Client({
     allowedMentions: {parse: ['users', 'roles'], repliedUser: true},
 });
 
+client.commands = new Collection();
+
+// Slash command handler
+const commandFolders = ['Public'];
+
+try {
+    for (const folder of commandFolders) {
+        const commandFiles = fs.readdirSync(`./Commands/${folder}`).filter(file => file.endsWith('.js'));
+        for (const file of commandFiles) {
+            const command = require(`./Commands/${folder}/${file}`);
+            client.commands.set(command.name, command);
+        }
+    }
+} catch (e) {
+    console.error('Could not load Slash Commands', e);
+}
+
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
     console.log(`Ready! Logged in as ${c.user.tag}`);
 });
 
+// Emitted when an interaction is created
 client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isCommand()) return;
+    if (!interaction.isChatInputCommand()) return;
 
-    if (interaction.commandName === 'ping') {
-        await interaction.reply('Pong!');
+    const command = interaction.client.commands.get(interaction.commandName);
+
+    if (!command) {
+        console.error(`No command matching ${interaction.commandName} was found.`);
+        return;
+    }
+
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
 });
 
