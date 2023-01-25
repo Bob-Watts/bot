@@ -38,6 +38,21 @@ const client = new Client({
 
 client.commands = new Collection();
 
+// Event handler
+const registerEventFolders = [
+    ['Guild'],
+];
+
+for (let registerEventFolder of registerEventFolders) {
+    const eventFile = fs.readdirSync(`./App/Events/${registerEventFolder}`)
+        .filter(file => file.endsWith('.js'));
+
+    for (const file of eventFile) {
+        const event = require(`./App/Events/${registerEventFolder}/${file}`);
+        client.on(event.name, (...args) => event.execute(...args));
+    }
+}
+
 // Slash command handler
 const commandFolders = ['Public'];
 
