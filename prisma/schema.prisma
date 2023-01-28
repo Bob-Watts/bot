@@ -40,8 +40,8 @@ model Users {
 }
 
 model Guilds {
-  id                       Int             @id @default(autoincrement())
-  guildId                  String          @unique
+  id                       Int              @id @default(autoincrement())
+  guildId                  String           @unique
   available                Boolean
   createdTimestamp         String
   joinedTimestamp          String
@@ -50,19 +50,19 @@ model Guilds {
   maximumPresences         Int?
   memberCount              Int?
   partnered                Boolean
-  prefix                   String          @default("!")
+  prefix                   String           @default("!")
   premiumSubscriptionCount Int?
   premiumTier              String
   verified                 Boolean
-  createdAt                DateTime        @default(now())
-  updatedAt                DateTime        @updatedAt
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
   Infractions              Infractions[]
   Moderators               Moderators[]
   GuildSettings            GuildSettings?
   GuildMembers             GuildMembers[]
   GuildLogs                GuildLogs?
   GuildChannels            GuildChannels[]
-  ThreadChannels           ThreadChannels?
+  ThreadChannels           ThreadChannels[]
 
   @@index([guildId])
 }
@@ -207,7 +207,7 @@ model ThreadChannels {
   owner               Users    @relation(fields: [ownerId], references: [accountId])
   guild               Guilds   @relation(fields: [guildId], references: [guildId])
   ownerId             String
-  guildId             String   @unique
+  guildId             String
   threadName          String
   archived            Boolean?
   archivedAt          String?

@@ -7,6 +7,8 @@ const fs = require('node:fs');
 
 // Require the necessary discord.js classes
 const {Client, Events, GatewayIntentBits, Partials, Collection} = require('discord.js');
+const Interaction = require("./App/Discord/Interaction");
+const Message = require("./App/Discord/Message");
 
 // Create a new client instance
 const client = new Client({
@@ -85,11 +87,25 @@ client.on(Events.InteractionCreate, async interaction => {
         return;
     }
 
+    if (interaction.guild) {
+        const interactionClass = new Interaction(interaction);
+        await interactionClass.getInteraction();
+    }
+
     try {
         await command.execute(interaction);
     } catch (error) {
         console.error(error);
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+    }
+});
+
+client.on(Events.MessageCreate, async message => {
+    if (message.author.bot || message.webhookId) return;
+
+    if (message.guild) {
+        const messageClass = new Message(message);
+        await messageClass.getMessage();
     }
 });
 
