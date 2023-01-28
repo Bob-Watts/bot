@@ -7,6 +7,7 @@ const fs = require('node:fs');
 
 // Require the necessary discord.js classes
 const {Client, Events, GatewayIntentBits, Partials, Collection} = require('discord.js');
+const Interaction = require("./App/Discord/Interaction");
 
 // Create a new client instance
 const client = new Client({
@@ -83,6 +84,11 @@ client.on(Events.InteractionCreate, async interaction => {
     if (!command) {
         console.error(`No command matching ${interaction.commandName} was found.`);
         return;
+    }
+
+    if (interaction.guild) {
+        const interactionClass = new Interaction(interaction);
+        await interactionClass.getInteraction();
     }
 
     try {
