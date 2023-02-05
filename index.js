@@ -56,7 +56,7 @@ for (let registerEventFolder of registerEventFolders) {
 }
 
 // Slash command handler
-const commandFolders = ['Public'];
+const commandFolders = ['Fun'];
 
 try {
     for (const folder of commandFolders) {
